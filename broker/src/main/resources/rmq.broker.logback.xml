@@ -600,6 +600,7 @@
     </appender>
 
     <logger name="RocketmqBroker" additivity="false" level="INFO">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="RocketmqBrokerSiftingAppender"/>
     </logger>
 

@@ -1092,4 +1092,15 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://172.28.38.181:8081/repository/mujup_component/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://172.28.38.181:8081/repository/mujup_component_snapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
