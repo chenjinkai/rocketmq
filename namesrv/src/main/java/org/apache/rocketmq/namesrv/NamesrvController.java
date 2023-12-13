@@ -99,13 +99,15 @@ public class NamesrvController {
     }
 
     public boolean initialize() {
-        loadConfig();
-        initiateNetworkComponents();
-        initiateThreadExecutors();
-        registerProcessor();
-        startScheduleService();
-        initiateSslContext();
-        initiateRpcHooks();
+        loadConfig();//加载kvConfig数据格式为嵌套的hashmap，table类型
+        initiateNetworkComponents();//实例化netty server和netty client
+        initiateThreadExecutors();//初始化两个线程池defaultExecutor和clientRequestExecutor
+        registerProcessor();//注册netty的processor，分本地测试和正式环境使用两种模式
+        startScheduleService(); //启动定时任务 1.扫描是否存在心跳过期的broker，并且进行注销
+                                // 2.打印kvconfig配置内容
+                                // 3.打印requestQueue和defaultQueue两个队列的水位情况，包括队列内元素个数和在队列内驻留时间
+        initiateSslContext(); //remotingServer初次加载以及动态加载ssl证书
+        initiateRpcHooks(); //按照zone来返回topic分布的队列和broker信息，TopicRouteData
         return true;
     }
 

@@ -99,7 +99,7 @@ public class ControllerManager {
             this.controllerRequestThreadPoolQueue,
             new ThreadFactoryImpl("ControllerRequestExecutorThread_"));
 
-        this.notifyService.initialize();
+        this.notifyService.initialize();//用于通知broker角色发生变化
         if (StringUtils.isEmpty(this.controllerConfig.getControllerDLegerPeers())) {
             throw new IllegalArgumentException("Attribute value controllerDLegerPeers of ControllerConfig is null or empty");
         }
@@ -108,16 +108,16 @@ public class ControllerManager {
         }
         this.controller = new DLedgerController(this.controllerConfig, this.heartbeatManager::isBrokerActive,
             this.nettyServerConfig, this.nettyClientConfig, this.brokerHousekeepingService,
-            new DefaultElectPolicy(this.heartbeatManager::isBrokerActive, this.heartbeatManager::getBrokerLiveInfo));
+            new DefaultElectPolicy(this.heartbeatManager::isBrokerActive, this.heartbeatManager::getBrokerLiveInfo));//raft选主相关
 
         // Initialize the basic resources
-        this.heartbeatManager.initialize();
+        this.heartbeatManager.initialize(); //初始化心跳管理器，主要监控其他broker心跳是否过期
 
         // Register broker inactive listener
-        this.heartbeatManager.registerBrokerLifecycleListener(this::onBrokerInactive);
-        this.controller.registerBrokerLifecycleListener(this::onBrokerInactive);
-        registerProcessor();
-        this.controllerMetricsManager = ControllerMetricsManager.getInstance(this);
+        this.heartbeatManager.registerBrokerLifecycleListener(this::onBrokerInactive);//注册broker生命周期过程监听器，心跳超时的broker下线，触发重新选主
+        this.controller.registerBrokerLifecycleListener(this::onBrokerInactive);//注册broker生命周期过程监听器，
+        registerProcessor();//注册controllerMamager响应rpc请求的processor
+        this.controllerMetricsManager = ControllerMetricsManager.getInstance(this);//初始化metric实例
         return true;
     }
 

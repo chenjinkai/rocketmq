@@ -16,12 +16,6 @@
  */
 package org.apache.rocketmq.namesrv;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.concurrent.Callable;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -33,12 +27,19 @@ import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.namesrv.NamesrvConfig;
 import org.apache.rocketmq.controller.ControllerManager;
 import org.apache.rocketmq.logging.org.slf4j.Logger;
+import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 import org.apache.rocketmq.remoting.netty.NettyClientConfig;
 import org.apache.rocketmq.remoting.netty.NettyServerConfig;
 import org.apache.rocketmq.remoting.protocol.RemotingCommand;
-import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 import org.apache.rocketmq.srvutil.ServerUtil;
 import org.apache.rocketmq.srvutil.ShutdownHookThread;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.concurrent.Callable;
 
 public class NamesrvStartup {
 
@@ -51,14 +52,14 @@ public class NamesrvStartup {
     private static ControllerConfig controllerConfig = null;
 
     public static void main(String[] args) {
-        main0(args);
-        controllerManagerMain();
+        main0(args); //1. 读取配置和命令行参数 2. 完成NamesrvController创建，初始化和启动
+        controllerManagerMain(); //ControllerManager 1. raft相关操作，选主,broker,replica等 2.broker心跳以及相关心跳超时管理，注销心跳超时broker
     }
 
     public static NamesrvController main0(String[] args) {
         try {
-            parseCommandlineAndConfigFile(args);
-            NamesrvController controller = createAndStartNamesrvController();
+            parseCommandlineAndConfigFile(args);//处理配置文件和命令行传入的参数
+            NamesrvController controller = createAndStartNamesrvController();//创建，初始化，启动NamesrvController
             return controller;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -83,8 +84,10 @@ public class NamesrvStartup {
     public static void parseCommandlineAndConfigFile(String[] args) throws Exception {
         System.setProperty(RemotingCommand.REMOTING_VERSION_KEY, Integer.toString(MQVersion.CURRENT_VERSION));
 
-        Options options = ServerUtil.buildCommandlineOptions(new Options());
-        CommandLine commandLine = ServerUtil.parseCmdLine("mqnamesrv", args, buildCommandlineOptions(options), new DefaultParser());
+        Options options = ServerUtil.buildCommandlineOptions(new Options());//初始化命令行参数，h（命令帮助）和n（nameserver地址列表）配置项
+        CommandLine commandLine = ServerUtil.parseCmdLine("mqnamesrv", args,
+                buildCommandlineOptions(options)/*c（配置文件）和p（打印配置项）配置项*/,
+                new DefaultParser());//判断和打印命令行是否包含h参数项
         if (null == commandLine) {
             System.exit(-1);
             return;
@@ -115,7 +118,7 @@ public class NamesrvStartup {
         }
 
         MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);
-        if (commandLine.hasOption('p')) {
+        if (commandLine.hasOption('p')) {//日志是否打印配置项
             MixAll.printObjectProperties(logConsole, namesrvConfig);
             MixAll.printObjectProperties(logConsole, nettyServerConfig);
             MixAll.printObjectProperties(logConsole, nettyClientConfig);
@@ -170,7 +173,7 @@ public class NamesrvStartup {
             return null;
         }));
 
-        controller.start();
+        controller.start();//1. 启动内部各项组件nettyServer nettyClient fileWatchService routeInfoManager
 
         return controller;
     }
