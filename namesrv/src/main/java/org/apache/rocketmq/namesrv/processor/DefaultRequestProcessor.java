@@ -222,6 +222,9 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
 
         Version brokerVersion = MQVersion.value2Version(request.getVersion());
         if (brokerVersion.ordinal() >= MQVersion.Version.V3_0_11.ordinal()) {
+            /**
+             * 反序列化注册broker的请求体，分为两种模式 1.未压缩（直接使用fastjson序列化） 2.压缩（不直接使用fastjson反序列化）
+             */
             final RegisterBrokerBody registerBrokerBody = extractRegisterBrokerBodyFromRequest(request, requestHeader);
             topicConfigWrapper = registerBrokerBody.getTopicConfigSerializeWrapper();
             filterServerList = registerBrokerBody.getFilterServerList();

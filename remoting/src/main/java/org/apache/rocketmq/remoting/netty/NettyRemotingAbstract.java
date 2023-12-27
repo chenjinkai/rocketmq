@@ -167,7 +167,7 @@ public abstract class NettyRemotingAbstract {
         if (msg != null) {
             switch (msg.getType()) {
                 case REQUEST_COMMAND:
-                    processRequestCommand(ctx, msg);
+                    processRequestCommand(ctx, msg);//处理收到的请求，按照收到的code使用对应处理器处理请求，如果不存在对应处理器，则使用默认处理器
                     break;
                 case RESPONSE_COMMAND:
                     processResponseCommand(ctx, msg);

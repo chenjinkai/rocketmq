@@ -69,7 +69,7 @@ public class RouteInfoManager {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
     private final static long DEFAULT_BROKER_CHANNEL_EXPIRED_TIME = 1000 * 60 * 2;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Map<String/* topic */, Map<String, QueueData>> topicQueueTable;
+    private final Map<String/* topic */, Map<String/* brokerName */, QueueData>> topicQueueTable;
     private final Map<String/* brokerName */, BrokerData> brokerAddrTable;
     private final Map<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable;
     private final Map<BrokerAddrInfo/* brokerAddr */, BrokerLiveInfo> brokerLiveTable;
@@ -222,7 +222,8 @@ public class RouteInfoManager {
         final Channel channel) {
         return registerBroker(clusterName, brokerAddr, brokerName, brokerId, haServerAddr, zoneName, timeoutMillis, false, topicConfigWrapper, filterServerList, channel);
     }
-
+    //1. this.clusterAddrTable注册  2.this.brokerAddrTable注册 3.去除brokerAddrTable中存储的ip+port相同，但是brokerId不同的broker信息
+    //4. this.brokerLiveTable注册，还需要判断数据版本号 5.this.topicQueueTable 注册，去除旧数据
     public RegisterBrokerResult registerBroker(
         final String clusterName,
         final String brokerAddr,

@@ -408,7 +408,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
     private void prepareSharableHandlers() {
         tlsModeHandler = new TlsModeHandler(TlsSystemConfig.tlsMode);
         encoder = new NettyEncoder();
-        connectionManageHandler = new NettyConnectManageHandler();
+        connectionManageHandler = new NettyConnectManageHandler();//记录一些日志，发布一些事件
         serverHandler = new NettyServerHandler();
         distributionHandler = new RemotingCodeDistributionHandler();
     }
@@ -555,7 +555,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
         }
 
         @Override
-        public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {//降低处理netty读取数据速度，这将导致压力传递给调用方（背压处理）
             Channel channel = ctx.channel();
             if (channel.isWritable()) {
                 if (!channel.config().isAutoRead()) {
