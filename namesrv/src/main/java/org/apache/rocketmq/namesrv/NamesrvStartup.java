@@ -53,7 +53,7 @@ public class NamesrvStartup {
 
     public static void main(String[] args) {
         main0(args); //1. 读取配置和命令行参数 2. 完成NamesrvController创建，初始化和启动
-        controllerManagerMain(); //ControllerManager 1. raft相关操作，选主,broker,replica等 2.broker心跳以及相关心跳超时管理，注销心跳超时broker
+        controllerManagerMain(); //ControllerManager 1. raft相关操作 2.broker心跳以及相关心跳超时管理，注销心跳超时broker
     }
 
     public static NamesrvController main0(String[] args) {
