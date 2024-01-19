@@ -749,21 +749,21 @@ public class BrokerController {
         try {
             DefaultMessageStore defaultMessageStore = new DefaultMessageStore(this.messageStoreConfig, this.brokerStatsManager, this.messageArrivingListener, this.brokerConfig, topicConfigManager.getTopicConfigTable());
 
-            if (messageStoreConfig.isEnableDLegerCommitLog()) {
+            if (messageStoreConfig.isEnableDLegerCommitLog()) {//如果在Raft中存储commit log，那么注册相应的角色变换处理器
                 DLedgerRoleChangeHandler roleChangeHandler =
                     new DLedgerRoleChangeHandler(this, defaultMessageStore);
                 ((DLedgerCommitLog) defaultMessageStore.getCommitLog())
                     .getdLedgerServer().getDLedgerLeaderElector().addRoleChangeHandler(roleChangeHandler);
             }
 
-            this.brokerStats = new BrokerStats(defaultMessageStore);
+            this.brokerStats = new BrokerStats(defaultMessageStore);//broker的统计信息
 
             // Load store plugin
             MessageStorePluginContext context = new MessageStorePluginContext(
                 messageStoreConfig, brokerStatsManager, messageArrivingListener, brokerConfig, configuration);
             this.messageStore = MessageStoreFactory.build(context, defaultMessageStore);
             this.messageStore.getDispatcherList().addFirst(new CommitLogDispatcherCalcBitMap(this.brokerConfig, this.consumerFilterManager));
-            if (messageStoreConfig.isTimerWheelEnable()) {
+            if (messageStoreConfig.isTimerWheelEnable()) {//是否开启了时间轮功能
                 this.timerCheckpoint = new TimerCheckpoint(BrokerPathConfigHelper.getTimerCheckPath(messageStoreConfig.getStorePathRootDir()));
                 TimerMetrics timerMetrics = new TimerMetrics(BrokerPathConfigHelper.getTimerMetricsPath(messageStoreConfig.getStorePathRootDir()));
                 this.timerMessageStore = new TimerMessageStore(messageStore, messageStoreConfig, timerCheckpoint, timerMetrics, brokerStatsManager);
@@ -779,12 +779,12 @@ public class BrokerController {
 
     public boolean initialize() throws CloneNotSupportedException {
 
-        boolean result = this.initializeMetadata();
+        boolean result = this.initializeMetadata(); //初始化几个在内存中存储topic状态的变量
         if (!result) {
             return false;
         }
 
-        result = this.initializeMessageStore();
+        result = this.initializeMessageStore(); //初始化MessageStore
         if (!result) {
             return false;
         }
@@ -802,16 +802,16 @@ public class BrokerController {
         }
 
         if (messageStore != null) {
-            registerMessageStoreHook();
-            result = this.messageStore.load();
+            registerMessageStoreHook(); //注册messageStoreHook
+            result = this.messageStore.load();//加载store目录下各种文件
         }
 
         if (messageStoreConfig.isTimerWheelEnable()) {
-            result = result && this.timerMessageStore.load();
+            result = result && this.timerMessageStore.load();//加载定时消息存储内容，进延迟队列
         }
 
         //scheduleMessageService load after messageStore load success
-        result = result && this.scheduleMessageService.load();
+        result = result && this.scheduleMessageService.load();//加载预定消息服务，进普通队列
 
         for (BrokerAttachedPlugin brokerAttachedPlugin : brokerAttachedPlugins) {
             if (brokerAttachedPlugin != null) {
@@ -823,13 +823,13 @@ public class BrokerController {
 
         if (result) {
 
-            initializeRemotingServer();
+            initializeRemotingServer();//初始化服务端，包括了一个fast的Server
 
-            initializeResources();
+            initializeResources();//初始化各种线程池
 
-            registerProcessor();
+            registerProcessor();//注册各种请求处理器
 
-            initializeScheduledTasks();
+            initializeScheduledTasks(); //初始化定时任务
 
             initialTransaction();
 
@@ -1624,10 +1624,10 @@ public class BrokerController {
         this.shouldStartTime = System.currentTimeMillis() + messageStoreConfig.getDisappearTimeAfterStart();
 
         if (messageStoreConfig.getTotalReplicas() > 1 && this.brokerConfig.isEnableSlaveActingMaster()) {
-            isIsolated = true;
+            isIsolated = true;//是否从集群中孤立
         }
 
-        if (this.brokerOuterAPI != null) {
+        if (this.brokerOuterAPI != null) {//访问其他组件的客户端
             this.brokerOuterAPI.start();
         }
 

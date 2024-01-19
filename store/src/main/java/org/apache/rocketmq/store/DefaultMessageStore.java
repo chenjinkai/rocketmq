@@ -317,7 +317,7 @@ public class DefaultMessageStore implements MessageStore {
         boolean result = true;
 
         try {
-            boolean lastExitOK = !this.isTempFileExist();
+            boolean lastExitOK = !this.isTempFileExist();//root目录下是否存在abort文件，用来判断是否正常退出
             LOGGER.info("last shutdown {}, store path root dir: {}",
                 lastExitOK ? "normally" : "abnormally", messageStoreConfig.getStorePathRootDir());
 

@@ -119,6 +119,13 @@ public class ControllerRequestProcessor implements NettyRequestProcessor {
         }
     }
 
+    /**
+     * 对请求进行处理，写操作将处理结果持久化到Raft存储，读操作则从Raft存储读取信息
+     * @param ctx
+     * @param request
+     * @return
+     * @throws Exception
+     */
     private RemotingCommand handleRequest(ChannelHandlerContext ctx, RemotingCommand request) throws Exception {
         switch (request.getCode()) {
             case CONTROLLER_ALTER_SYNC_STATE_SET:

@@ -131,7 +131,7 @@ public class ReplicasInfoManager {
         }
 
         // Check newSyncStateSet correctness
-        for (Long replica : newSyncStateSet) {
+        for (Long replica : newSyncStateSet) {//replica就是brokerId
             if (!brokerReplicaInfo.isBrokerExist(replica)) {
                 String err = String.format("Rejecting alter syncStateSet request because the replicas {%s} don't exist", replica);
                 LOGGER.error("{}", err);

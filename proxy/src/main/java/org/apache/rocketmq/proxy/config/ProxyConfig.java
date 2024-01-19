@@ -263,7 +263,7 @@ public class ProxyConfig implements ConfigFile {
 
     @Override
     public void initData() {
-        parseDelayLevel();
+        parseDelayLevel();//延迟消息的延迟时间level
         if (StringUtils.isEmpty(localServeAddr)) {
             this.localServeAddr = NetworkUtil.getLocalAddress();
         }

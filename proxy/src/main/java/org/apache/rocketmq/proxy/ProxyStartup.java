@@ -126,9 +126,9 @@ public class ProxyStartup {
         if (StringUtils.isNotBlank(commandLineArgument.getProxyConfigPath())) {
             System.setProperty(Configuration.CONFIG_PATH_PROPERTY, commandLineArgument.getProxyConfigPath());
         }
-        ConfigurationManager.initEnv();
-        ConfigurationManager.intConfig();
-        setConfigFromCommandLineArgument(commandLineArgument);
+        ConfigurationManager.initEnv();//初始化proxyHome
+        ConfigurationManager.intConfig();//加载配置文件，初始化ProxyConfig对象
+        setConfigFromCommandLineArgument(commandLineArgument);//将几个配置项设置到ProxyConfig对象
         log.info("Current configuration: " + ConfigurationManager.formatProxyConfig());
 
     }

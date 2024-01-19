@@ -236,7 +236,7 @@ public class BrokerStartup {
 
     public static BrokerController createBrokerController(String[] args) {
         try {
-            BrokerController controller = buildBrokerController(args);
+            BrokerController controller = buildBrokerController(args);//获取命令行参数，读取配置内容，创建BrokerController
             boolean initResult = controller.initialize();
             if (!initResult) {
                 controller.shutdown();
