@@ -61,7 +61,7 @@ public class MappedFileQueue implements Swappable {
         this.allocateMappedFileService = allocateMappedFileService;
     }
 
-    public void checkSelf() {
+    public void checkSelf() {//检查相邻文件名称的差值是否为配置的文件大小
         List<MappedFile> mappedFiles = new ArrayList<>(this.mappedFiles);
         if (!mappedFiles.isEmpty()) {
             Iterator<MappedFile> iterator = mappedFiles.iterator();

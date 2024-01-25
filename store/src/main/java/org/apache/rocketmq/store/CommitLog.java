@@ -144,11 +144,11 @@ public class CommitLog implements Swappable {
     }
 
     public boolean load() {
-        boolean result = this.mappedFileQueue.load();
-        if (result && !defaultMessageStore.getMessageStoreConfig().isDataReadAheadEnable()) {
-            scanFileAndSetReadMode(LibC.MADV_RANDOM);
+        boolean result = this.mappedFileQueue.load();//加载消息文件
+        if (result && !defaultMessageStore.getMessageStoreConfig().isDataReadAheadEnable()) {//是否开启消息预读取功能
+            scanFileAndSetReadMode(LibC.MADV_RANDOM);//设置文件为随机读取
         }
-        this.mappedFileQueue.checkSelf();
+        this.mappedFileQueue.checkSelf();//检查文件名称是否正确
         log.info("load commit log " + (result ? "OK" : "Failed"));
         return result;
     }
@@ -319,7 +319,7 @@ public class CommitLog implements Swappable {
             // normal recover doesn't require dispatching
             boolean doDispatch = false;
             while (true) {
-                DispatchRequest dispatchRequest = this.checkMessageAndReturnSize(byteBuffer, checkCRCOnRecover, checkDupInfo);
+                DispatchRequest dispatchRequest = this.checkMessageAndReturnSize(byteBuffer, checkCRCOnRecover, checkDupInfo);//对消息体做了解析，进行了校验。组装返回了DispatchRequest对象
                 int size = dispatchRequest.getMsgSize();
                 // Normal data
                 if (dispatchRequest.isSuccess() && size > 0) {
@@ -371,7 +371,7 @@ public class CommitLog implements Swappable {
 
             this.mappedFileQueue.setFlushedWhere(processOffset);
             this.mappedFileQueue.setCommittedWhere(processOffset);
-            this.mappedFileQueue.truncateDirtyFiles(processOffset);
+            this.mappedFileQueue.truncateDirtyFiles(processOffset);//删除脏数据，offset
 
             // Clear ConsumeQueue redundant data
             if (maxPhyOffsetOfConsumeQueue >= processOffset) {

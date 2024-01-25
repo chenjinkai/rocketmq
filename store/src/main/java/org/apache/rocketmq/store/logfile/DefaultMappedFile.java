@@ -129,7 +129,8 @@ public class DefaultMappedFile extends AbstractMappedFile {
     public DefaultMappedFile() {
     }
 
-    public DefaultMappedFile(final String fileName, final int fileSize) throws IOException {
+    public
+    DefaultMappedFile(final String fileName, final int fileSize) throws IOException {
         init(fileName, fileSize);
     }
 

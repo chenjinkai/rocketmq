@@ -313,7 +313,8 @@ public class MessageExtEncoder {
             return encoder;
         }
 
-        public StringBuilder getKeyBuilder() {
+        public StringBuilder
+        getKeyBuilder() {
             return keyBuilder;
         }
     }

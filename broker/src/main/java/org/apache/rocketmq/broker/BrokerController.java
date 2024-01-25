@@ -587,7 +587,7 @@ public class BrokerController {
             @Override
             public void run() {
                 try {
-                    BrokerController.this.consumerOffsetManager.persist();
+                    BrokerController.this.consumerOffsetManager.persist();// store\config\consumerOffset.json 配置持久化
                 } catch (Throwable e) {
                     LOG.error(
                         "BrokerController: failed to persist config file of consumerOffset", e);
@@ -599,7 +599,7 @@ public class BrokerController {
             @Override
             public void run() {
                 try {
-                    BrokerController.this.consumerFilterManager.persist();
+                    BrokerController.this.consumerFilterManager.persist(); //持久化文件
                     BrokerController.this.consumerOrderInfoManager.persist();
                 } catch (Throwable e) {
                     LOG.error(
@@ -613,7 +613,7 @@ public class BrokerController {
             @Override
             public void run() {
                 try {
-                    BrokerController.this.protectBroker();
+                    BrokerController.this.protectBroker();// 如果consumer消费慢，那么不让consumer消费，保护Broker
                 } catch (Throwable e) {
                     LOG.error("BrokerController: failed to protectBroker", e);
                 }
@@ -624,7 +624,7 @@ public class BrokerController {
             @Override
             public void run() {
                 try {
-                    BrokerController.this.printWaterMark();
+                    BrokerController.this.printWaterMark(); //打印水位信息
                 } catch (Throwable e) {
                     LOG.error("BrokerController: failed to print broker watermark", e);
                 }
@@ -637,7 +637,7 @@ public class BrokerController {
             public void run() {
                 try {
                     LOG.info("Dispatch task fall behind commit log {}bytes",
-                        BrokerController.this.getMessageStore().dispatchBehindBytes());
+                        BrokerController.this.getMessageStore().dispatchBehindBytes()); //已经提交到commit log但还未进入consumer queue的消息字节数
                 } catch (Throwable e) {
                     LOG.error("Failed to print dispatchBehindBytes", e);
                 }
@@ -659,13 +659,13 @@ public class BrokerController {
                     public void run() {
                         try {
                             if (System.currentTimeMillis() - lastSyncTimeMs > 60 * 1000) {
-                                BrokerController.this.getSlaveSynchronize().syncAll();
+                                BrokerController.this.getSlaveSynchronize().syncAll();//如果是Slave节点，需要从Master节点同步配置
                                 lastSyncTimeMs = System.currentTimeMillis();
                             }
 
                             //timer checkpoint, latency-sensitive, so sync it more frequently
                             if (messageStoreConfig.isTimerWheelEnable()) {
-                                BrokerController.this.getSlaveSynchronize().syncTimerCheckPoint();
+                                BrokerController.this.getSlaveSynchronize().syncTimerCheckPoint();//从Master节点同步TimerCheckpoint
                             }
                         } catch (Throwable e) {
                             LOG.error("Failed to sync all config for slave.", e);
@@ -679,7 +679,7 @@ public class BrokerController {
                     @Override
                     public void run() {
                         try {
-                            BrokerController.this.printMasterAndSlaveDiff();
+                            BrokerController.this.printMasterAndSlaveDiff();//Master节点，则打印Slave相对于Master commitlog的落后滞后程度
                         } catch (Throwable e) {
                             LOG.error("Failed to print diff of master and slave.", e);
                         }
@@ -695,7 +695,7 @@ public class BrokerController {
 
     protected void initializeScheduledTasks() {
 
-        initializeBrokerScheduledTasks();
+        initializeBrokerScheduledTasks();//启动定时任务 1. 打印Broker上一日监控数据 2. 定时持久化Broker配置文件
 
         if (this.brokerConfig.getNamesrvAddr() != null) {
             this.updateNamesrvAddr();
