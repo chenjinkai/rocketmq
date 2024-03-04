@@ -1369,7 +1369,7 @@ public class CommitLog implements Swappable {
                     CommitLog.this.defaultMessageStore.getMessageStoreConfig().getCommitCommitLogThoroughInterval();
 
                 long begin = System.currentTimeMillis();
-                if (begin >= (this.lastCommitTimestamp + commitDataThoroughInterval)) {
+                if (begin >= (this.lastCommitTimestamp + commitDataThoroughInterval)) {//如果到了需要commit的时间，那么进行commit所有的数据。如果没到时间那么最多commit 4个page。
                     this.lastCommitTimestamp = begin;
                     commitDataLeastPages = 0;
                 }
@@ -1377,12 +1377,12 @@ public class CommitLog implements Swappable {
                 try {
                     boolean result = CommitLog.this.mappedFileQueue.commit(commitDataLeastPages);
                     long end = System.currentTimeMillis();
-                    if (!result) {
-                        this.lastCommitTimestamp = end; // result = false means some data committed.
+                    if (!result) {// result = false means some data committed.
+                        this.lastCommitTimestamp = end;
                         CommitLog.this.flushManager.wakeUpFlush();
                     }
                     CommitLog.this.getMessageStore().getPerfCounter().flowOnce("COMMIT_DATA_TIME_MS", (int) (end - begin));
-                    if (end - begin > 500) {
+                    if (end - begin > 500) {//500ms以上就认为是比较慢了
                         log.info("Commit data to file costs {} ms", end - begin);
                     }
                     this.waitForRunning(interval);
@@ -1400,7 +1400,7 @@ public class CommitLog implements Swappable {
         }
     }
 
-    class FlushRealTimeService extends FlushCommitLogService {
+    class FlushRealTimeService extends FlushCommitLogService {//异步刷盘
         private long lastFlushTimestamp = 0;
         private long printTimes = 0;
 
@@ -1527,7 +1527,7 @@ public class CommitLog implements Swappable {
     /**
      * GroupCommit Service
      */
-    class GroupCommitService extends FlushCommitLogService {
+    class GroupCommitService extends FlushCommitLogService {//同步刷盘
         private volatile LinkedList<GroupCommitRequest> requestsWrite = new LinkedList<>();
         private volatile LinkedList<GroupCommitRequest> requestsRead = new LinkedList<>();
         private final PutMessageSpinLock lock = new PutMessageSpinLock();
@@ -1925,9 +1925,9 @@ public class CommitLog implements Swappable {
 
         public DefaultFlushManager() {
             if (FlushDiskType.SYNC_FLUSH == CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushDiskType()) {
-                this.flushCommitLogService = new CommitLog.GroupCommitService();
+                this.flushCommitLogService = new CommitLog.GroupCommitService();//同步
             } else {
-                this.flushCommitLogService = new CommitLog.FlushRealTimeService();
+                this.flushCommitLogService = new CommitLog.FlushRealTimeService();//异步
             }
 
             this.commitRealTimeService = new CommitLog.CommitRealTimeService();

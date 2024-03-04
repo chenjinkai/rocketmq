@@ -2741,7 +2741,7 @@ public class DefaultMessageStore implements MessageStore {
 
     }
 
-    class ReputMessageService extends ServiceThread {
+    class ReputMessageService extends ServiceThread {//构建ConsumeQueue文件
 
         protected volatile long reputFromOffset = 0;
 
@@ -2787,7 +2787,7 @@ public class DefaultMessageStore implements MessageStore {
             }
             for (boolean doNext = true; this.isCommitLogAvailable() && doNext; ) {
 
-                SelectMappedBufferResult result = DefaultMessageStore.this.commitLog.getData(reputFromOffset);
+                SelectMappedBufferResult result = DefaultMessageStore.this.commitLog.getData(reputFromOffset);//按照reputFromOffset定位到具体的commitlog文件的位置
 
                 if (result == null) {
                     break;
@@ -2808,9 +2808,9 @@ public class DefaultMessageStore implements MessageStore {
 
                         if (dispatchRequest.isSuccess()) {
                             if (size > 0) {
-                                DefaultMessageStore.this.doDispatch(dispatchRequest);
+                                DefaultMessageStore.this.doDispatch(dispatchRequest);//构建consumequeue和index文件
 
-                                if (DefaultMessageStore.this.brokerConfig.isLongPollingEnable()
+                                if (DefaultMessageStore.this.brokerConfig.isLongPollingEnable() //broker开启了longpolling
                                     && DefaultMessageStore.this.messageArrivingListener != null) {
                                     DefaultMessageStore.this.messageArrivingListener.arriving(dispatchRequest.getTopic(),
                                         dispatchRequest.getQueueId(), dispatchRequest.getConsumeQueueOffset() + 1,
