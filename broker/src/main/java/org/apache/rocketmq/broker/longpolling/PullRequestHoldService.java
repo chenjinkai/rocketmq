@@ -130,22 +130,22 @@ public class PullRequestHoldService extends ServiceThread {
 
                 for (PullRequest request : requestList) {
                     long newestOffset = maxOffset;
-                    if (newestOffset <= request.getPullFromThisOffset()) {
+                    if (newestOffset <= request.getPullFromThisOffset()) {//判断最新的消息的offset是否小于请求拉取消息的offset
                         newestOffset = this.brokerController.getMessageStore().getMaxOffsetInQueue(topic, queueId);
                     }
 
                     if (newestOffset > request.getPullFromThisOffset()) {
                         boolean match = request.getMessageFilter().isMatchedByConsumeQueue(tagsCode,
-                            new ConsumeQueueExt.CqExtUnit(tagsCode, msgStoreTime, filterBitMap));
+                            new ConsumeQueueExt.CqExtUnit(tagsCode, msgStoreTime, filterBitMap));//通过tag或者filter bitmap（在消息收到之后存入 consume queue ext）进行过滤
                         // match by bit map, need eval again when properties is not null.
                         if (match && properties != null) {
-                            match = request.getMessageFilter().isMatchedByCommitLog(null, properties);
+                            match = request.getMessageFilter().isMatchedByCommitLog(null, properties);//按照properties进行过滤
                         }
 
                         if (match) {
                             try {
                                 this.brokerController.getPullMessageProcessor().executeRequestWhenWakeup(request.getClientChannel(),
-                                    request.getRequestCommand());
+                                    request.getRequestCommand());//执行拉取消息的请求
                             } catch (Throwable e) {
                                 log.error(
                                     "PullRequestHoldService#notifyMessageArriving: failed to execute request when "

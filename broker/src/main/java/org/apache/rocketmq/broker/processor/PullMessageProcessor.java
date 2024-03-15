@@ -539,7 +539,7 @@ public class PullMessageProcessor implements NettyRequestProcessor {
                 RemotingCommand finalResponse = response;
                 messageStore.getMessageAsync(group, topic, queueId, requestHeader.getQueueOffset(),
                         requestHeader.getMaxMsgNums(), messageFilter)
-                    .thenApply(result -> {
+                    .thenApply(result -> {//异步获取消息内容
                         if (null == result) {
                             finalResponse.setCode(ResponseCode.SYSTEM_ERROR);
                             finalResponse.setRemark("store getMessage return null");

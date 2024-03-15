@@ -235,7 +235,7 @@ public class ScheduleMessageService extends ConfigManager {
             for (int delayLevel : delayLevelTable.keySet()) {
                 ConsumeQueueInterface cq =
                     brokerController.getMessageStore().getQueueStore().findOrCreateConsumeQueue(TopicValidator.RMQ_SYS_SCHEDULE_TOPIC,
-                        delayLevel2QueueId(delayLevel));
+                        delayLevel2QueueId(delayLevel));//delayLevel - 1
                 Long currentDelayOffset = offsetTable.get(delayLevel);
                 if (currentDelayOffset == null || cq == null) {
                     continue;
@@ -295,7 +295,7 @@ public class ScheduleMessageService extends ConfigManager {
         return delayOffsetSerializeWrapper.toJson(prettyFormat);
     }
 
-    public boolean parseDelayLevel() {
+    public boolean parseDelayLevel() {//解析延迟level,最终结果为 1-xms,2-yms
         HashMap<String, Long> timeUnitTable = new HashMap<>();
         timeUnitTable.put("s", 1000L);
         timeUnitTable.put("m", 1000L * 60);
