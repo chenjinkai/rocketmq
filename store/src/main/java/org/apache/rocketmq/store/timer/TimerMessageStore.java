@@ -89,7 +89,7 @@ public class TimerMessageStore {
 
     // The total days in the timer wheel when precision is 1000ms.
     // If the broker shutdown last more than the configured days, will cause message loss
-    public static final int TIMER_WHEEL_TTL_DAY = 7;
+    public static final int TIMER_WHEEL_TTL_DAY = 7; //最多存7天
     public static final int TIMER_BLANK_SLOTS = 60;
     public static final int MAGIC_DEFAULT = 1;
     public static final int MAGIC_ROLL = 1 << 1;
@@ -197,7 +197,7 @@ public class TimerMessageStore {
             }
         };
 
-        if (storeConfig.isTimerEnableDisruptor()) {
+        if (storeConfig.isTimerEnableDisruptor()) {//默认关闭高性能队列Disruptor
             enqueuePutQueue = new DisruptorBlockingQueue<>(DEFAULT_CAPACITY);
             dequeueGetQueue = new DisruptorBlockingQueue<>(DEFAULT_CAPACITY);
             dequeuePutQueue = new DisruptorBlockingQueue<>(DEFAULT_CAPACITY);

@@ -398,14 +398,14 @@ public class ScheduleMessageService extends ConfigManager {
         public void executeOnTimeUp() {
             ConsumeQueueInterface cq =
                 ScheduleMessageService.this.brokerController.getMessageStore().getConsumeQueue(TopicValidator.RMQ_SYS_SCHEDULE_TOPIC,
-                    delayLevel2QueueId(delayLevel));
+                    delayLevel2QueueId(delayLevel));//获取当前延迟级别的延迟消息ConsumeQueue
 
             if (cq == null) {
                 this.scheduleNextTimerTask(this.offset, DELAY_FOR_A_WHILE);
                 return;
             }
 
-            ReferredIterator<CqUnit> bufferCQ = cq.iterateFrom(this.offset);
+            ReferredIterator<CqUnit> bufferCQ = cq.iterateFrom(this.offset);//获取当前队列还未被消费的数据
             if (bufferCQ == null) {
                 long resetOffset;
                 if ((resetOffset = cq.getMinOffsetInQueue()) > this.offset) {
